@@ -1,0 +1,12 @@
+{
+  "name": "ExpoMediaLibraryDemo",
+  "displayName": "ExpoMediaLibraryDemo",
+  "expo": {
+    "name": "ExpoMediaLibraryDemo",
+    "slug": "ExpoMediaLibraryDemo",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
