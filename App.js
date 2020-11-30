@@ -1,21 +1,68 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useRef, useState, useEffect } from "react";
+import { StyleSheet, Text, View, Button } from "react-native";
+import { Camera } from "expo-camera";
+import * as MediaLibrary from "expo-media-library";
 
 export default function App() {
+  const [hasPermission, setHasPermission] = useState(null);
+  const camera = useRef(null);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestPermissionsAsync();
+      setHasPermission(status === "granted");
+    })();
+  }, []);
+
+  if (hasPermission === null) {
+    return null;
+  }
+
+  if (hasPermission === false) {
+    return (
+      <View style={styles.container}>
+        <Text>No access to camera</Text>
+      </View>
+    );
+  }
+
+  async function savePicture() {
+    try {
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      const { uri } = await camera.current.takePictureAsync();
+
+      if (status === MediaLibrary.PermissionStatus.GRANTED) {
+        await MediaLibrary.createAssetAsync(uri);
+      }
+    } catch (err) {
+      console.log("err", err);
+    }
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Camera
+      ref={camera}
+      style={styles.container}
+      type={Camera.Constants.Type.back}
+    >
+      <Button
+        style={styles.button}
+        title={"Save photo"}
+        onPress={savePicture}
+      />
+    </Camera>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  button: {
+    position: "absolute",
+    bottom: 100,
   },
 });
